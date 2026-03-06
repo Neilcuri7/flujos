@@ -1,0 +1,316 @@
+{
+  "updatedAt": "2026-02-21T01:43:05.671Z",
+  "createdAt": "2026-02-21T01:33:29.539Z",
+  "id": "sfrkfB75wxtek4Om",
+  "name": "post mejorado",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "node": "17841466322787900",
+        "graphApiVersion": "v25.0",
+        "imageUrl": "={{ $json.url }}",
+        "caption": "={{ $json.data }}",
+        "additionalFields": {}
+      },
+      "type": "@mookielianhd/n8n-nodes-instagram.instagram",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        80
+      ],
+      "id": "b4793e3d-76af-4508-ab22-1288eef7cd13",
+      "name": "Publish",
+      "credentials": {
+        "instagramApi": {
+          "id": "YCgyhDcshvjjLcnL",
+          "name": "Instagram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1o5JCBoYMjS737uMbft4bMbtUNb-NC4HS",
+          "mode": "list",
+          "cachedResultName": "post",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1o5JCBoYMjS737uMbft4bMbtUNb-NC4HS"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "=all"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1eed7622-b3d5-42ed-a7c7-41993dcfa351",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "EGk8DDHyK4BzdrcK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $json.name.split('.')[0] }}",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1o5JCBoYMjS737uMbft4bMbtUNb-NC4HS",
+            "mode": "list",
+            "cachedResultName": "post",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1o5JCBoYMjS737uMbft4bMbtUNb-NC4HS"
+          }
+        },
+        "options": {
+          "fields": [
+            "webViewLink",
+            "exportLinks",
+            "name",
+            "id"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        224,
+        224
+      ],
+      "id": "93016b86-cf35-41db-bcb1-7a27788d2367",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "EGk8DDHyK4BzdrcK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "=data",
+        "destinationKey": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        224
+      ],
+      "id": "f53c1ed5-c89e-4d48-a924-7b0109ee29bf",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Google Drive Trigger').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "fileName": "={{ $json.name.split('.')[0] == \"r2\" }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        240,
+        -16
+      ],
+      "id": "b24f1656-e8c4-49db-872a-8ab42c21a2e5",
+      "name": "Download image",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "EGk8DDHyK4BzdrcK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        432,
+        224
+      ],
+      "id": "04936589-249a-4399-8147-94189c37ec63",
+      "name": "Download description",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "EGk8DDHyK4BzdrcK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "uploadFile",
+        "additionalFieldsFile": {}
+      },
+      "type": "n8n-nodes-cloudinary.cloudinary",
+      "typeVersion": 1,
+      "position": [
+        464,
+        -16
+      ],
+      "id": "ec43a145-e220-4a97-894d-09a424370b47",
+      "name": "Upload an asset from file data",
+      "credentials": {
+        "cloudinaryApi": {
+          "id": "IB0s8z82HCOp0VHD",
+          "name": "Cloudinary account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        848,
+        80
+      ],
+      "id": "8d7d86a8-b89e-4a4a-a472-4c844b0e4369",
+      "name": "Merge"
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Download image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Download description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Publish": {
+      "main": [
+        []
+      ]
+    },
+    "Download image": {
+      "main": [
+        [
+          {
+            "node": "Upload an asset from file data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download description": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload an asset from file data": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "7680b826-5581-41e5-8472-23d14e7d007e",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-21T01:33:29.546Z",
+      "createdAt": "2026-02-21T01:33:29.546Z",
+      "role": "workflow:owner",
+      "workflowId": "sfrkfB75wxtek4Om",
+      "projectId": "wXGdfvyT0OKSL0Hm"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
