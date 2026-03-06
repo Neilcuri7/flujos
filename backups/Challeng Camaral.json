@@ -1,0 +1,639 @@
+{
+  "updatedAt": "2026-02-01T18:09:50.041Z",
+  "createdAt": "2026-02-01T15:08:57.915Z",
+  "id": "ZDuYfLJo_Zdu4nWRn66er",
+  "name": "Challeng Camaral",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1600,
+        96
+      ],
+      "id": "2a142c07-4002-42b2-9e4e-283ac6e99570",
+      "name": "WhatsApp Trigger",
+      "webhookId": "7c2d33fc-df4a-4fcf-adde-148082ef42f4",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "EtoSobgoXZ98tpfX",
+          "name": "WhatsApp OAuth account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $json.contacts[0].wa_id }}",
+        "textBody": "=Por ahora solo puedo procesar mensajes de texto. ¡Escríbeme tu consulta!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -1072,
+        224
+      ],
+      "id": "c1be8b8d-b6da-4ecb-82ab-4c057335d681",
+      "name": "Send message terminado1",
+      "webhookId": "64896f98-353e-4982-98ed-6523e0099dc3",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "KaWOvvgAWDzbRhnj",
+          "name": "WhatsApp account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 7
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -624,
+        64
+      ],
+      "id": "2758de9a-f23f-4b04-9c19-de15a0cdf88a",
+      "name": "Wait",
+      "webhookId": "1355cc01-d753-4d41-88d7-79b0798b7d19"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f55013ae-5eb5-4205-9c1d-1aa5083e3395",
+              "leftValue": "={{ $json.messages[0].type }}",
+              "rightValue": "text",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1376,
+        96
+      ],
+      "id": "f976e22c-af24-41ed-ac8e-0254d681a46a",
+      "name": "If type mesage"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9c6ec93e-4f79-4c34-bdfc-b6ff205fd1a4",
+              "leftValue": "={{ $json[''].toNumber() }}",
+              "rightValue": "={{ $('WhatsApp Trigger').item.json.messages[0].timestamp.toNumber() }}",
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        64
+      ],
+      "id": "60acd447-099e-4f5e-b098-7a360cb90a69",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=last_update:{{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "value": "={{ $('WhatsApp Trigger').item.json.messages[0].timestamp }}",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 120
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        64
+      ],
+      "id": "0720238a-b329-4161-9db7-b3080550ad95",
+      "name": "current_timestamp",
+      "credentials": {
+        "redis": {
+          "id": "FX1X0Aup0LQz8rCU",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "=buffer:{{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "messageData": "={{ $('WhatsApp Trigger').item.json.messages[0].text.body }}",
+        "tail": true
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1072,
+        64
+      ],
+      "id": "f4ddc688-bf3c-40b5-92e6-f8c7fe0753ab",
+      "name": "messages buffer",
+      "credentials": {
+        "redis": {
+          "id": "FX1X0Aup0LQz8rCU",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "=",
+        "key": "=last_update:{{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "keyType": "string",
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        64
+      ],
+      "id": "38d01672-38f0-4906-88ec-44282c07751d",
+      "name": "Get last_update",
+      "credentials": {
+        "redis": {
+          "id": "FX1X0Aup0LQz8rCU",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "=",
+        "key": "=buffer:{{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "keyType": "list",
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        48
+      ],
+      "id": "85628d56-aecc-48ec-ab60-6648f70a3064",
+      "name": "Get messages",
+      "credentials": {
+        "redis": {
+          "id": "FX1X0Aup0LQz8rCU",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload your data to test RAG",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload your file(s)",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf, .csv",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -688,
+        336
+      ],
+      "id": "10fdd7f1-e44e-4510-86c1-4724c955f228",
+      "name": "Upload your file here",
+      "webhookId": "48571076-3c5c-4c7d-a8f3-653311741874"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        560
+      ],
+      "id": "c52dea0a-1084-4278-86db-60b5712a0f0e",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "content": "### 📚 Load Data Flow",
+        "height": 460,
+        "width": 700,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -736,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "3cd2b87b-bfb6-4f78-8b10-ef31bdc3c62c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "value": "vector_store_key",
+          "mode": "list",
+          "cachedResultName": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.2,
+      "position": [
+        -496,
+        336
+      ],
+      "id": "4a253e2f-3919-4393-b9ae-31340f470679",
+      "name": "Insert Data to Store"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "knowledge_base",
+        "toolDescription": "Use this knowledge base to answer questions from the user",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        400
+      ],
+      "id": "907f1247-6d91-4163-b566-8c5875da0e7a",
+      "name": "Query Data Tool"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json[''] }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        176,
+        48
+      ],
+      "id": "453a0fd5-4c1e-408f-94f5-679177f92704",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        112,
+        272
+      ],
+      "id": "5a8d92e6-b956-4dc9-9cec-f813e435ee4e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2gNMMxMkQztWhzAB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        816
+      ],
+      "id": "5f91c42b-00e6-41bb-97f2-39e0ea0eaff5",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2gNMMxMkQztWhzAB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        48
+      ],
+      "id": "46407ac4-584d-45e0-9c2b-fa2d77bf8a52",
+      "name": "Send message terminado2",
+      "webhookId": "64896f98-353e-4982-98ed-6523e0099dc3",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "KaWOvvgAWDzbRhnj",
+          "name": "WhatsApp account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Buffer de mensajes\n",
+        "height": 208,
+        "width": 832
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1104,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "f42fef01-1c06-418e-9385-02c803e6c309",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=buffer:{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        688,
+        48
+      ],
+      "id": "46597877-37f1-4487-a159-f5d473d84b41",
+      "name": "Delete Buffer",
+      "credentials": {
+        "redis": {
+          "id": "FX1X0Aup0LQz8rCU",
+          "name": "Redis account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "If type mesage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get last_update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If type mesage": {
+      "main": [
+        [
+          {
+            "node": "messages buffer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send message terminado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "current_timestamp": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "messages buffer": {
+      "main": [
+        [
+          {
+            "node": "current_timestamp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get last_update": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get messages": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload your file here": {
+      "main": [
+        [
+          {
+            "node": "Insert Data to Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Insert Data to Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Data Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message terminado2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Insert Data to Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Query Data Tool",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message terminado2": {
+      "main": [
+        [
+          {
+            "node": "Delete Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3eff2697-df23-48be-a7fa-6c18aa5d9c73",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-01T15:08:57.924Z",
+      "createdAt": "2026-02-01T15:08:57.924Z",
+      "role": "workflow:owner",
+      "workflowId": "ZDuYfLJo_Zdu4nWRn66er",
+      "projectId": "wXGdfvyT0OKSL0Hm"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
