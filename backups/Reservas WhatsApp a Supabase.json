@@ -1,0 +1,583 @@
+{
+  "updatedAt": "2026-02-20T17:54:58.265Z",
+  "createdAt": "2025-12-29T16:38:05.754Z",
+  "id": "XcJ3FvU2oozkIYU4",
+  "name": "Reservas WhatsApp a Supabase",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1472,
+        352
+      ],
+      "id": "1c19d115-cb4e-4300-8d62-a6332e8d4f70",
+      "name": "WhatsApp Trigger",
+      "webhookId": "7c2d33fc-df4a-4fcf-adde-148082ef42f4",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "EtoSobgoXZ98tpfX",
+          "name": "WhatsApp OAuth account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}.\ndia del mensaje: {{ $today }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Eres un asistente de recepción de un cibercafé.\nTu objetivo es capturar 3 datos para una reserva: \"fecha\", \"hora\" y \"cantidad\".\n\nIMPORTANTE: Hoy es {{ $now.toFormat('yyyy-MM-dd') }}.\n\nREGLAS DE LÓGICA:\n1.  **Formato de Fecha:** Todas las fechas DEBEN ser convertidas al formato YYYY-MM-DD. (ej: 'mañana' debe ser '{{ $now.plus({days: 1}).toFormat('yyyy-MM-dd') }}').\n2.  **Formato de Hora:** Todas las horas DEBEN ser convertidas a formato militar de 24 horas (HH:MM). (ej: '3pm' es '15:00', '10am' es '10:00').\n3.  Si el usuario saluda o no es relevante, responde: \"Hola. Soy tu asistente de reservas. ¿En qué puedo ayudarte?\"\n4.  Si faltan datos (ej: \"Quiero una reserva\"), pide todo: \"¡Claro! ¿Para qué fecha, hora y cuántas personas sería?\"\n5.  Si faltan datos parciales (ej: \"Mañana para 3 personas\"), pide lo que falta: \"Entendido. ¿Para qué hora sería la reserva?\"\n6.  Si tienes TODOS los datos (ej: \"Mañana a las 10 para 3\"), responde que vas a verificar: \"¡Perfecto! Un momento, estoy verificando la disponibilidad...\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -1024,
+        96
+      ],
+      "id": "c2b2decf-7920-454b-8eb0-1a25bfa0bef6",
+      "name": "AI Agent",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1024,
+        320
+      ],
+      "id": "eaecaf12-d31e-4d98-9c92-c4951069210d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2gNMMxMkQztWhzAB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "notes": "Eres un asistente de recepción de un cibercafé.\nTu objetivo es capturar 3 datos para una reserva: \"fecha\", \"hora\" y \"cantidad\".\nTu respuesta debe ser *SIEMPRE* un único objeto JSON. No escribas nada más.\n\nEl JSON debe tener esta estructura:\n{\n  \"mensaje_para_usuario\": \"...\",\n  \"datos_completos\": false,\n  \"datos_extraidos\": {\n    \"fecha\": \"YYYY-MM-DD\" | null,\n    \"hora\": \"HH:MM\" | null,\n    \"cantidad\": null\n  }\n}\n\nREGLAS DE LÓGICA:\n1.  Si el usuario saluda o el mensaje no es relevante:\n    - \"mensaje_para_usuario\": \"Hola. Soy tu asistente de reservas. ¿En qué puedo ayudarte?\"\n    - \"datos_completos\": false\n\n2.  Si el usuario pide una reserva pero falta información (ej: \"Quiero una reserva\"):\n    - \"mensaje_para_usuario\": \"¡Claro! ¿Para qué fecha, hora y cuántas personas sería?\"\n    - \"datos_completos\": false\n\n3.  Si el usuario da información parcial (ej: \"Mañana para 3 personas\"):\n    - \"mensaje_para_usuario\": \"Entendido. ¿Para qué hora sería la reserva?\"\n    - \"datos_completos\": false\n    - \"datos_extraidos\": (llena lo que tengas, ej: \"fecha\": \"2025-11-09\", \"cantidad\": 3)\n\n4.  Si el usuario da *toda* la información (ej: \"Mañana a las 10 para 3\"):\n    - \"mensaje_para_usuario\": \"¡Perfecto! Un momento, estoy verificando la disponibilidad...\"\n    - \"datos_completos\": true\n    - \"datos_extraidos\": (llena todos los datos)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f55013ae-5eb5-4205-9c1d-1aa5083e3395",
+              "leftValue": "={{ $json.messages[0].text.body}}",
+              "rightValue": "reserva",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "66f6cf81-1b78-4912-adb4-ddb632b2ab56",
+              "leftValue": "={{ $json.messages[0].text.body}}",
+              "rightValue": "separar",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1248,
+        352
+      ],
+      "id": "e3b348f2-815b-4666-91eb-b4d38156a838",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zfssfgwpyuajwhezwvoj.supabase.co/rest/v1/rpc/crear_reserva_ciber",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"p_usuario_id\": \"{{ $json.id }}\",\n  \"p_fecha\": \"{{ $('AI Agent').item.json.output.output.datos_extraidos.fecha }}\",\n  \"p_hora\": \"{{ $('AI Agent').item.json.output.output.datos_extraidos.hora }}\",\n  \"p_cantidad_solicitada\": {{ $('AI Agent').item.json.output.output.datos_extraidos.cantidad }}\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ba566018-2b7a-433a-9dfc-ca702021f986",
+      "name": "HTTP Request",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RXdJo3uGOvZG9zGT",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "59ee58fe-703a-4c11-a915-d93ebe1efa33",
+              "leftValue": "={{ $json.output.output.datos_completos }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -672,
+        192
+      ],
+      "id": "71ceff2f-b97f-4df9-9c35-21e5332afb80",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"output\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"mensaje_para_usuario\": {\n              \"type\": \"string\"\n            },\n            \"datos_completos\": {\n              \"type\": \"boolean\"\n            },\n            \"datos_extraidos\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"fecha\": {\n                  \"type\": \"string\"\n                },\n                \"hora\": {\n                  \"type\": \"string\"\n                },\n                \"cantidad\": {\n                  \"type\": \"number\"\n                }\n              }\n            }\n          },\n          \"required\": [\n            \"mensaje_para_usuario\",\n            \"datos_completos\",\n            \"datos_extraidos\"\n          ]\n        }\n      },\n      \"required\": [\"output\"]\n    }\n  },\n  \"required\": [\"output\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -848,
+        320
+      ],
+      "id": "c0ea925c-442c-4fa1-9d7c-8158a979f4d9",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "usuarios",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefono",
+              "condition": "eq",
+              "keyValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        96
+      ],
+      "id": "6a46b20f-10b4-4719-a5ff-c316d9275f5e",
+      "name": "Get many rows",
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "RXdJo3uGOvZG9zGT",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4f5d0410-65ff-4bdf-95e5-190440e0e69d",
+              "leftValue": "={{ $json.telefono }}",
+              "rightValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        96
+      ],
+      "id": "182d87f7-ae1b-4b54-b3e9-6f879f64646d",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "tableId": "usuarios",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "nombre",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].profile.name }}"
+            },
+            {
+              "fieldId": "telefono",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "937d71ea-eb33-4973-9e67-d0f1a3620d56",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RXdJo3uGOvZG9zGT",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zfssfgwpyuajwhezwvoj.supabase.co/rest/v1/rpc/crear_reserva_ciber",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"p_usuario_id\": \"{{ $json.id }}\",\n  \"p_fecha\": \"{{ $('AI Agent').item.json.output.output.datos_extraidos.fecha }}\",\n  \"p_hora\": \"{{ $('AI Agent').item.json.output.output.datos_extraidos.hora }}\",\n  \"p_cantidad_solicitada\": {{ $('AI Agent').item.json.output.output.datos_extraidos.cantidad }}\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        192
+      ],
+      "id": "9d0a45e1-7c4c-4be5-9d03-d3ab435bd2b7",
+      "name": "HTTP Request1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "RXdJo3uGOvZG9zGT",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $json.contacts[0].wa_id }}",
+        "textBody": "=Hola. ¿En qué puedo ayudarte?",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -960,
+        496
+      ],
+      "id": "486ed259-ac25-4433-a31b-f89ef1591d57",
+      "name": "Send message terminado",
+      "webhookId": "64896f98-353e-4982-98ed-6523e0099dc3",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "KaWOvvgAWDzbRhnj",
+          "name": "WhatsApp account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.output.mensaje_para_usuario }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -448,
+        288
+      ],
+      "id": "bebd1665-5f84-4052-b492-5ec9866367d2",
+      "name": "Send message falta de datos",
+      "webhookId": "64896f98-353e-4982-98ed-6523e0099dc3",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "KaWOvvgAWDzbRhnj",
+          "name": "WhatsApp account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $('AI Agent').item.json.output.output.mensaje_para_usuario }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "08a0787f-496e-4661-b8a3-92b488ac5a52",
+      "name": "Respuesta sin crear",
+      "webhookId": "64896f98-353e-4982-98ed-6523e0099dc3",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "KaWOvvgAWDzbRhnj",
+          "name": "WhatsApp account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $('AI Agent').item.json.output.output.mensaje_para_usuario }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        192
+      ],
+      "id": "ff2ea8d0-a2ff-4f68-bb54-41636d62a37b",
+      "name": "usuario creado",
+      "webhookId": "64896f98-353e-4982-98ed-6523e0099dc3",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "KaWOvvgAWDzbRhnj",
+          "name": "WhatsApp account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send message terminado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respuesta sin crear",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send message falta de datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "usuario creado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "eb79cf03-cf3f-4440-abce-4745e9f2500e",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-29T16:38:05.764Z",
+      "createdAt": "2025-12-29T16:38:05.764Z",
+      "role": "workflow:owner",
+      "workflowId": "XcJ3FvU2oozkIYU4",
+      "projectId": "wXGdfvyT0OKSL0Hm"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
