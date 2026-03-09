@@ -1,6 +1,8 @@
 {
   "json": {
+    "updatedAt": "2026-03-09T17:32:14.207Z",
     "createdAt": "2026-03-09T15:19:17.098Z",
+    "id": "irLFahWFiQQI8xUd",
     "name": "github",
     "active": false,
     "isArchived": false,
@@ -13,6 +15,7 @@
           432,
           272
         ],
+        "id": "60b9cfac-5d1a-4f32-a466-53bdeeb69c57",
         "name": "When clicking ‘Execute workflow’"
       },
       {
@@ -26,9 +29,11 @@
           672,
           336
         ],
+        "id": "344fe5e1-e771-46a9-8095-ed8576ee45c6",
         "name": "Get many workflows1",
         "credentials": {
           "n8nApi": {
+            "id": "wsjbVGuFGH50Z26Z",
             "name": "n8n account"
           }
         }
@@ -50,7 +55,7 @@
             "cachedResultUrl": "https://github.com/Neilcuri7/flujos"
           },
           "filePath": "=test/{{ $('Get a file').item.json.name }}",
-          "fileContent": "={{ JSON.stringify($json, null, 2) }}",
+          "fileContent": "={{ JSON.stringify($('Get many workflows1').item, null, 2) }}",
           "commitMessage": "=guardado automatico de {{ $('Get a file').item.json.name }}"
         },
         "type": "n8n-nodes-base.github",
@@ -59,10 +64,12 @@
           1712,
           496
         ],
+        "id": "51b8b1bd-832f-443d-a13e-93e9744242a4",
         "name": "Edit a file",
         "webhookId": "9822c382-6c76-4244-9e9e-13db9b2540a9",
         "credentials": {
           "githubApi": {
+            "id": "d5HxMNBcqh49Rv9O",
             "name": "GitHub account"
           }
         }
@@ -91,10 +98,12 @@
           912,
           304
         ],
+        "id": "fe9b88d0-c41c-4bba-89fb-3a7fc83a4e9e",
         "name": "Get a file",
         "webhookId": "658ab6ad-c0f8-4228-9d86-6a311a1321ea",
         "credentials": {
           "githubApi": {
+            "id": "d5HxMNBcqh49Rv9O",
             "name": "GitHub account"
           }
         },
@@ -111,8 +120,9 @@
             },
             "conditions": [
               {
-                "leftValue": "={{ JSON.stringify($node[\"Code in JavaScript\"].json.github_workflow.nodes) }}",
-                "rightValue": "={{ JSON.stringify($json.json.nodes) }}",
+                "id": "9a4267ba-6870-48f9-9210-c4a0bba5b37f",
+                "leftValue": "={{ JSON.stringify($('Get many workflows1').item.json.nodes, (key, value) => [\"id\", \"position\", \"updatedAt\"].includes(key) ? undefined : value) }}",
+                "rightValue": "={{ JSON.stringify($node[\"Code in JavaScript\"].json.github_workflow.nodes, (key, value) => [\"id\", \"position\", \"updatedAt\"].includes(key) ? undefined : value) }}",
                 "operator": {
                   "type": "string",
                   "operation": "equals",
@@ -130,6 +140,7 @@
           1472,
           416
         ],
+        "id": "8ebbdf3e-ec7d-4368-8dc3-c94e999d560f",
         "name": "If"
       },
       {
@@ -144,6 +155,7 @@
           1248,
           464
         ],
+        "id": "0e354750-217d-4311-b6d5-5f6f80351e83",
         "name": "Edit workflows"
       },
       {
@@ -156,6 +168,7 @@
           1264,
           304
         ],
+        "id": "9a85a705-b241-4be3-b967-75d6f153e140",
         "name": "Code in JavaScript"
       },
       {
@@ -169,6 +182,7 @@
             },
             "conditions": [
               {
+                "id": "7ef89ca6-66bd-48e5-98d1-685f7c5af2a7",
                 "leftValue": "={{ $json.error }}",
                 "rightValue": "",
                 "operator": {
@@ -188,6 +202,7 @@
           1104,
           176
         ],
+        "id": "ec40e9a0-03a0-4365-b081-dc66c631a151",
         "name": "If1"
       },
       {
@@ -215,10 +230,12 @@
           1376,
           160
         ],
+        "id": "91861eab-c7e0-4ab5-8e16-21b483ace4c4",
         "name": "Create a file",
         "webhookId": "9822c382-6c76-4244-9e9e-13db9b2540a9",
         "credentials": {
           "githubApi": {
+            "id": "d5HxMNBcqh49Rv9O",
             "name": "GitHub account"
           }
         }
@@ -331,11 +348,12 @@
       "templateCredsSetupCompleted": true
     },
     "pinData": {},
-    "versionId": "7a992c4d-0dfa-4cd1-89f9-60bfb891e285",
+    "versionId": "b33b19ed-7a14-4195-a70c-15df3c4e334a",
     "activeVersionId": null,
     "triggerCount": 0,
     "shared": [
       {
+        "updatedAt": "2026-03-09T15:19:17.105Z",
         "createdAt": "2026-03-09T15:19:17.105Z",
         "role": "workflow:owner",
         "workflowId": "irLFahWFiQQI8xUd",
