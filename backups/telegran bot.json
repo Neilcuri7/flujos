@@ -1,0 +1,197 @@
+{
+  "json": {
+    "createdAt": "2026-03-09T20:14:59.436Z",
+    "name": "telegran bot",
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "updates": [
+            "message"
+          ],
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          0
+        ],
+        "name": "Telegram Trigger",
+        "webhookId": "3afe7993-d9b2-46f8-a6d6-eb72abf7cc1c",
+        "credentials": {
+          "telegramApi": {
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "sendPhoto",
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "file": "={{ $json.body.items[0].url }}",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          720,
+          -16
+        ],
+        "name": "Send a photo message",
+        "webhookId": "2fa1ef12-0446-4770-a4e8-71eb6f831805",
+        "credentials": {
+          "telegramApi": {
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://api.waifu.im/images?IncludedTags=waifu",
+          "options": {
+            "response": {
+              "response": {
+                "fullResponse": true,
+                "neverError": true,
+                "responseFormat": "json"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          448,
+          -16
+        ],
+        "name": "HTTP Request"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $json.message.text }}",
+                "rightValue": "/img",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          192,
+          0
+        ],
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+          "text": "=Name: {{ $('HTTP Request').item.json.body.items[0].tags[0].name }}\nDescription: \n{{ $('HTTP Request').item.json.body.items[0].tags[0].description }}",
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          944,
+          -16
+        ],
+        "name": "Send a text message",
+        "webhookId": "2fa1ef12-0446-4770-a4e8-71eb6f831805",
+        "credentials": {
+          "telegramApi": {
+            "name": "Telegram account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a photo message": {
+        "main": [
+          [
+            {
+              "node": "Send a text message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "Send a photo message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate",
+      "availableInMCP": false
+    },
+    "staticData": null,
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "pinData": {},
+    "versionId": "9a3e9fb6-f574-4fb0-b504-089a25b87121",
+    "activeVersionId": null,
+    "triggerCount": 0,
+    "shared": [
+      {
+        "createdAt": "2026-03-09T20:14:59.452Z",
+        "role": "workflow:owner",
+        "workflowId": "SsWHInPbZGLKkPHo",
+        "projectId": "SsTCDhE5BizkSpAs"
+      }
+    ],
+    "activeVersion": null,
+    "tags": []
+  },
+  "pairedItem": {
+    "item": 0
+  }
+}
