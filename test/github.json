@@ -1,6 +1,6 @@
 {
   "json": {
-    "updatedAt": "2026-03-09T17:47:18.155Z",
+    "updatedAt": "2026-03-09T19:47:28.328Z",
     "createdAt": "2026-03-09T15:19:17.098Z",
     "id": "irLFahWFiQQI8xUd",
     "name": "github",
@@ -121,8 +121,8 @@
             "conditions": [
               {
                 "id": "9a4267ba-6870-48f9-9210-c4a0bba5b37f",
-                "leftValue": "={{ JSON.stringify($('Get many workflows1').item.json.nodes, (key, value) => [\"id\", \"position\", \"updatedAt\"].includes(key) ? undefined : value) }}",
-                "rightValue": "={{ JSON.stringify($node[\"Code in JavaScript\"].json.github_workflow.nodes, (key, value) => [\"id\", \"position\", \"updatedAt\"].includes(key) ? undefined : value) }}",
+                "leftValue": "={{ JSON.stringify($('Code in JavaScript').item.json.github_workflow.json.nodes, (key, value) => [\"id\", \"position\", \"updatedAt\"].includes(key) ? undefined : value) }}",
+                "rightValue": "={{ JSON.stringify($('Get many workflows1').item.json.nodes, (key, value) => [\"id\", \"position\", \"updatedAt\"].includes(key) ? undefined : value) }}",
                 "operator": {
                   "type": "string",
                   "operation": "equals",
@@ -130,43 +130,28 @@
                 }
               }
             ],
-            "combinator": "and"
+            "combinator": "or"
           },
           "options": {}
         },
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.3,
         "position": [
-          1472,
-          416
+          1456,
+          400
         ],
         "id": "8ebbdf3e-ec7d-4368-8dc3-c94e999d560f",
         "name": "If"
       },
       {
         "parameters": {
-          "mode": "raw",
-          "jsonOutput": "={{ JSON.stringify($('Get many workflows1').item, (key, value) => [\"id\", \"updatedAt\"].includes(key) ? undefined : value, 2) }}",
-          "options": {}
-        },
-        "type": "n8n-nodes-base.set",
-        "typeVersion": 3.4,
-        "position": [
-          1248,
-          464
-        ],
-        "id": "0e354750-217d-4311-b6d5-5f6f80351e83",
-        "name": "Edit workflows"
-      },
-      {
-        "parameters": {
-          "jsCode": "const base64Content = $input.first().json.content.replace(/\\n/g, ''); // Limpiar saltos de línea\nconst decodedText = Buffer.from(base64Content, 'base64').toString('utf-8'); // Decodificar\nconst jsonObject = JSON.parse(decodedText); // Convertir a objeto\n\nreturn {\n  github_workflow: jsonObject\n};"
+          "jsCode": "const base64Content = $('Get a file').first().json.content.replace(/\\n/g, ''); // Limpiar saltos de línea\nconst decodedText = Buffer.from(base64Content, 'base64').toString('utf-8'); // Decodificar\nconst jsonObject = JSON.parse(decodedText); // Convertir a objeto\n\nreturn {\n  github_workflow: jsonObject\n};"
         },
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          1264,
-          304
+          1248,
+          368
         ],
         "id": "9a85a705-b241-4be3-b967-75d6f153e140",
         "name": "Code in JavaScript"
@@ -292,17 +277,6 @@
           ]
         ]
       },
-      "Edit workflows": {
-        "main": [
-          [
-            {
-              "node": "If",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
       "Code in JavaScript": {
         "main": [
           [
@@ -328,11 +302,6 @@
               "node": "Code in JavaScript",
               "type": "main",
               "index": 0
-            },
-            {
-              "node": "Edit workflows",
-              "type": "main",
-              "index": 0
             }
           ]
         ]
@@ -348,7 +317,7 @@
       "templateCredsSetupCompleted": true
     },
     "pinData": {},
-    "versionId": "084fa689-c590-41be-a04c-1fcf6ec2b4ad",
+    "versionId": "6c3f590e-1e8d-493c-97d5-5cddb56aea2b",
     "activeVersionId": null,
     "triggerCount": 0,
     "shared": [
