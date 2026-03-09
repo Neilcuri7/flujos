@@ -1,6 +1,8 @@
 {
-  "json": {
-    "createdAt": "2026-03-09T15:19:17.098Z",
+  "github_workflow": {
+    "updatedAt": "2026-03-06T22:00:54.610Z",
+    "createdAt": "2026-03-02T15:34:03.903Z",
+    "id": "SyGs8RTvKjyq5PJI_L7j6",
     "name": "github",
     "active": false,
     "isArchived": false,
@@ -10,9 +12,10 @@
         "type": "n8n-nodes-base.manualTrigger",
         "typeVersion": 1,
         "position": [
-          432,
-          272
+          0,
+          48
         ],
+        "id": "539d78e9-2c8b-4fb0-a52c-9be7cf970c03",
         "name": "When clicking ‘Execute workflow’"
       },
       {
@@ -23,12 +26,14 @@
         "type": "n8n-nodes-base.n8n",
         "typeVersion": 1,
         "position": [
-          672,
-          336
+          240,
+          48
         ],
+        "id": "df4fc36f-dfff-4f8d-a8b3-4fbeb16664cf",
         "name": "Get many workflows1",
         "credentials": {
           "n8nApi": {
+            "id": "wsjbVGuFGH50Z26Z",
             "name": "n8n account"
           }
         }
@@ -49,176 +54,22 @@
             "cachedResultName": "flujos",
             "cachedResultUrl": "https://github.com/Neilcuri7/flujos"
           },
-          "filePath": "=test/{{ $('Get a file').item.json.name }}",
+          "filePath": "=backups/{{$json.name}}.json",
           "fileContent": "={{ JSON.stringify($json, null, 2) }}",
-          "commitMessage": "=guardado automatico de {{ $('Get a file').item.json.name }}"
+          "commitMessage": "=guardado automatico de {{$json.name}}"
         },
         "type": "n8n-nodes-base.github",
         "typeVersion": 1.1,
         "position": [
-          1712,
-          496
+          432,
+          48
         ],
+        "id": "b3130617-0ab1-43c0-bfa0-8984899e97d7",
         "name": "Edit a file",
         "webhookId": "9822c382-6c76-4244-9e9e-13db9b2540a9",
         "credentials": {
           "githubApi": {
-            "name": "GitHub account"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "resource": "file",
-          "operation": "get",
-          "owner": {
-            "__rl": true,
-            "value": "Neilcuri7",
-            "mode": "name"
-          },
-          "repository": {
-            "__rl": true,
-            "value": "flujos",
-            "mode": "name"
-          },
-          "filePath": "=backups/{{ $json.name }}.json",
-          "asBinaryProperty": false,
-          "additionalParameters": {}
-        },
-        "type": "n8n-nodes-base.github",
-        "typeVersion": 1.1,
-        "position": [
-          912,
-          304
-        ],
-        "name": "Get a file",
-        "webhookId": "658ab6ad-c0f8-4228-9d86-6a311a1321ea",
-        "credentials": {
-          "githubApi": {
-            "name": "GitHub account"
-          }
-        },
-        "onError": "continueRegularOutput"
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "strict",
-              "version": 3
-            },
-            "conditions": [
-              {
-                "leftValue": "={{ JSON.stringify($node[\"Code in JavaScript\"].json.github_workflow.nodes) }}",
-                "rightValue": "={{ JSON.stringify($json.json.nodes) }}",
-                "operator": {
-                  "type": "string",
-                  "operation": "equals",
-                  "name": "filter.operator.equals"
-                }
-              }
-            ],
-            "combinator": "and"
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 2.3,
-        "position": [
-          1472,
-          416
-        ],
-        "name": "If"
-      },
-      {
-        "parameters": {
-          "mode": "raw",
-          "jsonOutput": "={{ JSON.stringify($('Get many workflows1').item, (key, value) => [\"id\", \"updatedAt\"].includes(key) ? undefined : value, 2) }}",
-          "options": {}
-        },
-        "type": "n8n-nodes-base.set",
-        "typeVersion": 3.4,
-        "position": [
-          1248,
-          464
-        ],
-        "name": "Edit workflows"
-      },
-      {
-        "parameters": {
-          "jsCode": "const base64Content = $input.first().json.content.replace(/\\n/g, ''); // Limpiar saltos de línea\nconst decodedText = Buffer.from(base64Content, 'base64').toString('utf-8'); // Decodificar\nconst jsonObject = JSON.parse(decodedText); // Convertir a objeto\n\nreturn {\n  github_workflow: jsonObject\n};"
-        },
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          1264,
-          304
-        ],
-        "name": "Code in JavaScript"
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "strict",
-              "version": 3
-            },
-            "conditions": [
-              {
-                "leftValue": "={{ $json.error }}",
-                "rightValue": "",
-                "operator": {
-                  "type": "string",
-                  "operation": "exists",
-                  "singleValue": true
-                }
-              }
-            ],
-            "combinator": "and"
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 2.3,
-        "position": [
-          1104,
-          176
-        ],
-        "name": "If1"
-      },
-      {
-        "parameters": {
-          "resource": "file",
-          "owner": {
-            "__rl": true,
-            "mode": "name",
-            "value": "Neilcuri7"
-          },
-          "repository": {
-            "__rl": true,
-            "value": "flujos",
-            "mode": "list",
-            "cachedResultName": "flujos",
-            "cachedResultUrl": "https://github.com/Neilcuri7/flujos"
-          },
-          "filePath": "=test/{{ $('Get many workflows1').item.json.name }}.json",
-          "fileContent": "={{ JSON.stringify($('Get many workflows1').item, (key, value) => [\"id\", \"updatedAt\"].includes(key) ? undefined : value, 2) }}",
-          "commitMessage": "=Creado automatico de {{ $('Get many workflows1').item.json.name }}"
-        },
-        "type": "n8n-nodes-base.github",
-        "typeVersion": 1.1,
-        "position": [
-          1376,
-          160
-        ],
-        "name": "Create a file",
-        "webhookId": "9822c382-6c76-4244-9e9e-13db9b2540a9",
-        "credentials": {
-          "githubApi": {
+            "id": "d5HxMNBcqh49Rv9O",
             "name": "GitHub account"
           }
         }
@@ -240,80 +91,7 @@
         "main": [
           [
             {
-              "node": "Get a file",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Edit a file": {
-        "main": [
-          []
-        ]
-      },
-      "Get a file": {
-        "main": [
-          [
-            {
-              "node": "If1",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "If": {
-        "main": [
-          [],
-          [
-            {
               "node": "Edit a file",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Edit workflows": {
-        "main": [
-          [
-            {
-              "node": "If",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Code in JavaScript": {
-        "main": [
-          [
-            {
-              "node": "If",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "If1": {
-        "main": [
-          [
-            {
-              "node": "Create a file",
-              "type": "main",
-              "index": 0
-            }
-          ],
-          [
-            {
-              "node": "Code in JavaScript",
-              "type": "main",
-              "index": 0
-            },
-            {
-              "node": "Edit workflows",
               "type": "main",
               "index": 0
             }
@@ -323,7 +101,6 @@
     },
     "settings": {
       "executionOrder": "v1",
-      "binaryMode": "separate",
       "availableInMCP": false
     },
     "staticData": null,
@@ -331,21 +108,19 @@
       "templateCredsSetupCompleted": true
     },
     "pinData": {},
-    "versionId": "7a992c4d-0dfa-4cd1-89f9-60bfb891e285",
+    "versionId": "0fcbf63a-4c74-4870-a6cb-ff5301ac2be5",
     "activeVersionId": null,
     "triggerCount": 0,
     "shared": [
       {
-        "createdAt": "2026-03-09T15:19:17.105Z",
+        "updatedAt": "2026-03-02T15:34:03.911Z",
+        "createdAt": "2026-03-02T15:34:03.911Z",
         "role": "workflow:owner",
-        "workflowId": "irLFahWFiQQI8xUd",
-        "projectId": "SsTCDhE5BizkSpAs"
+        "workflowId": "SyGs8RTvKjyq5PJI_L7j6",
+        "projectId": "wXGdfvyT0OKSL0Hm"
       }
     ],
     "activeVersion": null,
     "tags": []
-  },
-  "pairedItem": {
-    "item": 0
   }
 }
