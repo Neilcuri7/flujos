@@ -1,6 +1,6 @@
 {
   "json": {
-    "updatedAt": "2026-03-09T17:32:14.207Z",
+    "updatedAt": "2026-03-09T17:47:18.155Z",
     "createdAt": "2026-03-09T15:19:17.098Z",
     "id": "irLFahWFiQQI8xUd",
     "name": "github",
@@ -88,7 +88,7 @@
             "value": "flujos",
             "mode": "name"
           },
-          "filePath": "=backups/{{ $json.name }}.json",
+          "filePath": "=test/{{ $json.name }}.json",
           "asBinaryProperty": false,
           "additionalParameters": {}
         },
@@ -348,7 +348,7 @@
       "templateCredsSetupCompleted": true
     },
     "pinData": {},
-    "versionId": "b33b19ed-7a14-4195-a70c-15df3c4e334a",
+    "versionId": "084fa689-c590-41be-a04c-1fcf6ec2b4ad",
     "activeVersionId": null,
     "triggerCount": 0,
     "shared": [
