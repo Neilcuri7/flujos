@@ -1,6 +1,8 @@
 {
   "json": {
+    "updatedAt": "2026-03-09T20:56:16.003Z",
     "createdAt": "2026-03-09T20:14:59.436Z",
+    "id": "SsWHInPbZGLKkPHo",
     "name": "telegran bot",
     "active": false,
     "isArchived": false,
@@ -18,10 +20,12 @@
           0,
           0
         ],
+        "id": "986848a9-d0ad-4825-bedf-a7fd2af6be1f",
         "name": "Telegram Trigger",
         "webhookId": "3afe7993-d9b2-46f8-a6d6-eb72abf7cc1c",
         "credentials": {
           "telegramApi": {
+            "id": "0h8bDSeO715m2cHu",
             "name": "Telegram account"
           }
         }
@@ -39,10 +43,12 @@
           720,
           -16
         ],
+        "id": "fa278fa0-b65a-4a67-bcd9-e922238f4eb1",
         "name": "Send a photo message",
         "webhookId": "2fa1ef12-0446-4770-a4e8-71eb6f831805",
         "credentials": {
           "telegramApi": {
+            "id": "0h8bDSeO715m2cHu",
             "name": "Telegram account"
           }
         }
@@ -66,6 +72,7 @@
           448,
           -16
         ],
+        "id": "d3e4db12-6538-43bd-b000-5625a1bdca05",
         "name": "HTTP Request"
       },
       {
@@ -79,6 +86,7 @@
             },
             "conditions": [
               {
+                "id": "48e845e8-ba98-4797-b576-fbb6a136f07d",
                 "leftValue": "={{ $json.message.text }}",
                 "rightValue": "/img",
                 "operator": {
@@ -97,6 +105,7 @@
           192,
           0
         ],
+        "id": "b5433df9-1068-4a1c-83a3-49a85618016b",
         "name": "If"
       },
       {
@@ -111,10 +120,12 @@
           944,
           -16
         ],
+        "id": "7cc74bd8-d810-4739-be9d-5c76c9cd0b67",
         "name": "Send a text message",
         "webhookId": "2fa1ef12-0446-4770-a4e8-71eb6f831805",
         "credentials": {
           "telegramApi": {
+            "id": "0h8bDSeO715m2cHu",
             "name": "Telegram account"
           }
         }
@@ -182,6 +193,7 @@
     "triggerCount": 0,
     "shared": [
       {
+        "updatedAt": "2026-03-09T20:14:59.452Z",
         "createdAt": "2026-03-09T20:14:59.452Z",
         "role": "workflow:owner",
         "workflowId": "SsWHInPbZGLKkPHo",
